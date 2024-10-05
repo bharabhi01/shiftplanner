@@ -2,10 +2,10 @@ import React from "react";
 import { Table, Form } from "semantic-ui-react";
 
 const ShiftTable = ({ people, backups, setPeople, setBackups }) => {
-  // Function to handle date changes
-  const handleDateChange = (index, date, type) => {
+  // Function to handle input changes for shifts and leaves
+  const handleInputChange = (index, value, field, type) => {
     const updatedList = type === "person" ? [...people] : [...backups];
-    updatedList[index].leaves = date;
+    updatedList[index][field] = value; // Update shifts or leaves
     if (type === "person") {
       setPeople(updatedList);
     } else {
@@ -22,6 +22,7 @@ const ShiftTable = ({ people, backups, setPeople, setBackups }) => {
           <Table.HeaderCell>Shifts (Weeks)</Table.HeaderCell>
           <Table.HeaderCell>Backup Name</Table.HeaderCell>
           <Table.HeaderCell>Backup Leaves</Table.HeaderCell>
+          <Table.HeaderCell>Backup Shifts (Weeks)</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
 
@@ -33,37 +34,27 @@ const ShiftTable = ({ people, backups, setPeople, setBackups }) => {
               <Form.Input
                 placeholder="Person Name"
                 value={person.name}
-                onChange={(e) => {
-                  const updatedPeople = [...people];
-                  updatedPeople[index].name = e.target.value;
-                  setPeople(updatedPeople);
-                }}
+                onChange={(e) => handleInputChange(index, e.target.value, "name", "person")}
               />
             </Table.Cell>
 
-            {/* Date Input for Person's Leaves */}
+            {/* Person's Leaves Input */}
             <Table.Cell>
               <Form.Input
-                type="date"
+                type="text"
+                placeholder="Leaves (e.g., 2023-10-01, 2023-10-10)"
                 value={person.leaves || ''}
-                onChange={(e, { value }) => handleDateChange(index, value, "person")}
-                placeholder="Select Leave Date"
+                onChange={(e) => handleInputChange(index, e.target.value, "leaves", "person")}
               />
             </Table.Cell>
 
-            {/* Shifts (Week Numbers) */}
+            {/* Person's Shifts Input */}
             <Table.Cell>
               <Form.Input
-                type="number"
-                placeholder="Shifts (Week Numbers)"
-                value={person.shifts}
-                onChange={(e) => {
-                  const updatedPeople = [...people];
-                  updatedPeople[index].shifts = e.target.value
-                    .split(",")
-                    .map(Number);
-                  setPeople(updatedPeople);
-                }}
+                type="text"
+                placeholder="Shifts (Weeks, e.g., 1, 2, 3)"
+                value={person.shifts || ''}
+                onChange={(e) => handleInputChange(index, e.target.value, "shifts", "person")}
               />
             </Table.Cell>
 
@@ -72,21 +63,27 @@ const ShiftTable = ({ people, backups, setPeople, setBackups }) => {
               <Form.Input
                 placeholder="Backup Name"
                 value={backups[index]?.name}
-                onChange={(e) => {
-                  const updatedBackups = [...backups];
-                  updatedBackups[index].name = e.target.value;
-                  setBackups(updatedBackups);
-                }}
+                onChange={(e) => handleInputChange(index, e.target.value, "name", "backup")}
               />
             </Table.Cell>
 
-            {/* Date Input for Backup's Leaves */}
+            {/* Backup's Leaves Input */}
             <Table.Cell>
               <Form.Input
-                type="date"
+                type="text"
+                placeholder="Backup Leaves (e.g., 2023-10-05)"
                 value={backups[index]?.leaves || ''}
-                onChange={(e, { value }) => handleDateChange(index, value, "backup")}
-                placeholder="Select Backup Leave Date"
+                onChange={(e) => handleInputChange(index, e.target.value, "leaves", "backup")}
+              />
+            </Table.Cell>
+
+            {/* Backup's Shifts Input */}
+            <Table.Cell>
+              <Form.Input
+                type="text"
+                placeholder="Backup Shifts (Weeks, e.g., 1, 3, 5)"
+                value={backups[index]?.shifts || ''}
+                onChange={(e) => handleInputChange(index, e.target.value, "shifts", "backup")}
               />
             </Table.Cell>
           </Table.Row>

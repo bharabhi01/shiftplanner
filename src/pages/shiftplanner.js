@@ -1,22 +1,24 @@
 import React, { useState } from "react";
 import ShiftTable from "../components/ShiftTable";
 import ShiftForm from "../components/ShiftForm";
-import ShiftCalender from "../components/ShiftCalender";
 import { checkConsecutiveShifts } from "../utils/validation";
 import axios from "axios";
 
 const ShiftPlanner = () => {
-  const [people, setPeople] = useState([{ name: "", leaves: [], shifts: 0 }]);
-  const [backups, setBackups] = useState([{ name: "", leaves: [], shifts: 0 }]);
+  const [people, setPeople] = useState([{ name: "", leaves: "", shifts: "" }]);
+  const [backups, setBackups] = useState([{ name: "", leaves: "", shifts: "" }]);
   const [errorMessage, setErrorMessage] = useState("");
   const [shiftData, setShiftData] = useState([]);
 
   const handleAddPerson = () => {
-    setPeople([...people, { name: "", leaves: [], shifts: 0 }]);
-    setBackups([...backups, { name: "", leaves: [], shifts: 0 }]);
+    const newPerson = { name: "", leaves: "", shifts: "" };
+    const newBackup = { name: "", leaves: "", shifts: "" };
+    setPeople([...people, newPerson]);
+    setBackups([...backups, newBackup]);
   };
 
-  const handleSaveShiftPerson = () => {
+  const handleSaveShiftPerson = async () => {
+    // Check for consecutive shifts before saving
     for (let i = 0; i < people.length; i++) {
       if (
         checkConsecutiveShifts(people[i]) ||
@@ -29,14 +31,24 @@ const ShiftPlanner = () => {
 
     setErrorMessage("");
 
-    axios
-      .post("http://localhost:5000/shifts", { people, backups })
-      .then((response) => {
-        setShiftData(response.data);
-      })
-      .catch((error) => {
-        console.error("Error saving data", error);
-      });
+    // Prepare the data to match the backend structure
+    const requests = people.map((person, index) => {
+      return {
+        name: person.name,
+        leaves: person.leaves,
+        backupName: backups[index]?.name,
+        backupLeaves: backups[index]?.leaves,
+        shifts: person.shifts.split(",").map(Number), // assuming shifts are input as a comma-separated string
+        backupShifts: backups[index]?.shifts.split(",").map(Number), // same for backup shifts
+      };
+    });
+
+    try {
+      const response = await axios.post("http://localhost:8080/api/shifts", requests);
+      setShiftData(response.data);
+    } catch (error) {
+      console.error("Error saving data", error);
+    }
   };
 
   return (
