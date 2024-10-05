@@ -1,13 +1,11 @@
 import React from "react";
 import { Table, Form } from "semantic-ui-react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 const ShiftTable = ({ people, backups, setPeople, setBackups }) => {
   // Function to handle date changes
   const handleDateChange = (index, date, type) => {
     const updatedList = type === "person" ? [...people] : [...backups];
-    updatedList[index].leaves = date; // Date will now be a valid Date object or null
+    updatedList[index].leaves = date;
     if (type === "person") {
       setPeople(updatedList);
     } else {
@@ -43,13 +41,13 @@ const ShiftTable = ({ people, backups, setPeople, setBackups }) => {
               />
             </Table.Cell>
 
-            {/* Date Picker for Person's Leaves */}
+            {/* Date Input for Person's Leaves */}
             <Table.Cell>
-              <DatePicker
-                selected={person.leaves} // A single date or null
-                onChange={(date) => handleDateChange(index, date, "person")}
-                isClearable
-                placeholderText="Select Leave Date"
+              <Form.Input
+                type="date"
+                value={person.leaves || ''}
+                onChange={(e, { value }) => handleDateChange(index, value, "person")}
+                placeholder="Select Leave Date"
               />
             </Table.Cell>
 
@@ -82,13 +80,13 @@ const ShiftTable = ({ people, backups, setPeople, setBackups }) => {
               />
             </Table.Cell>
 
-            {/* Date Picker for Backup's Leaves */}
+            {/* Date Input for Backup's Leaves */}
             <Table.Cell>
-              <DatePicker
-                selected={backups[index]?.leaves} // A single date or null
-                onChange={(date) => handleDateChange(index, date, "backup")}
-                isClearable
-                placeholderText="Select Backup Leave Date"
+              <Form.Input
+                type="date"
+                value={backups[index]?.leaves || ''}
+                onChange={(e, { value }) => handleDateChange(index, value, "backup")}
+                placeholder="Select Backup Leave Date"
               />
             </Table.Cell>
           </Table.Row>
