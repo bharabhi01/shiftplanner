@@ -31,7 +31,6 @@ const ShiftPlanner = () => {
 
     setErrorMessage("");
 
-    // Prepare the data to match the backend structure
     const requests = people.map((person, index) => {
       return {
         name: person.name,
